@@ -7,16 +7,16 @@
 # Your changes will be overwritten when the template updates (daily)
 # Instead, change your .upptimerc.yml configuration: https://upptime.js.org/docs
 
-name: Update Template CI
+name: Summary CI
 on:
   schedule:
     - cron: "0 0 * * *"
   repository_dispatch:
-    types: [update_template]
+    types: [summary]
   workflow_dispatch:
 jobs:
   release:
-    name: Build
+    name: Generate README
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
@@ -40,9 +40,17 @@ jobs:
           git-commit-gpgsign: true
           git-committer-name: ${{ env.GIT_COMMITTER_NAME }}
           git-committer-email: ${{ env.GIT_COMMITTER_EMAIL }}
-      - name: Update template
+      - name: Update summary in README
         uses: danielphan2003/uptime-monitor@master
         with:
-          command: "update-template"
+          command: "readme"
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Run readme-repos-list
+        uses: koj-co/readme-repos-list@master
+        with:
+          token: ${{ secrets.GH_PAT }}
+          query: "topic:upptime"
+          size: 20
+          max: 1000
+          one-per-owner: true

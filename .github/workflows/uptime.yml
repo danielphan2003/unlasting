@@ -7,16 +7,16 @@
 # Your changes will be overwritten when the template updates (daily)
 # Instead, change your .upptimerc.yml configuration: https://upptime.js.org/docs
 
-name: Update Template CI
+name: Uptime CI
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "*/5 * * * *"
   repository_dispatch:
-    types: [update_template]
+    types: [uptime]
   workflow_dispatch:
 jobs:
   release:
-    name: Build
+    name: Check status
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
@@ -40,9 +40,10 @@ jobs:
           git-commit-gpgsign: true
           git-committer-name: ${{ env.GIT_COMMITTER_NAME }}
           git-committer-email: ${{ env.GIT_COMMITTER_EMAIL }}
-      - name: Update template
+      - name: Check endpoint status
         uses: danielphan2003/uptime-monitor@master
         with:
-          command: "update-template"
+          command: "update"
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
