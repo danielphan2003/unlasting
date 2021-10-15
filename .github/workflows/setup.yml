@@ -7,16 +7,17 @@
 # Your changes will be overwritten when the template updates (daily)
 # Instead, change your .upptimerc.yml configuration: https://upptime.js.org/docs
 
-name: Update Template CI
+name: Setup CI
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  push:
+    paths:
+      - ".upptimerc.yml"
   repository_dispatch:
-    types: [update_template]
+    types: [setup]
   workflow_dispatch:
 jobs:
   release:
-    name: Build
+    name: Setup Upptime
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
@@ -40,8 +41,39 @@ jobs:
           git-committer-name: ${{ env.GIT_COMMITTER_NAME }}
           git-committer-email: ${{ env.GIT_COMMITTER_EMAIL }}
       - name: Update template
-        uses: upptime/uptime-monitor@master
+        uses: danielphan2003/uptime-monitor@master
         with:
           command: "update-template"
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Update response time
+        uses: danielphan2003/uptime-monitor@master
+        with:
+          command: "response-time"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+      - name: Update summary in README
+        uses: danielphan2003/uptime-monitor@master
+        with:
+          command: "readme"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Generate graphs
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Graphs CI
+          token: ${{ secrets.GH_PAT }}
+      - name: Generate site
+        uses: danielphan2003/uptime-monitor@master
+        with:
+          command: "site"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+      - uses: peaceiris/actions-gh-pages@v3.7.3
+        name: GitHub Pages Deploy
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          publish_dir: "site/status-page/__sapper__/export/"
+          user_name: "GitHub automation"
+          user_email: "danielphan.2003@gmail.com"
