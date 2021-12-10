@@ -11,9 +11,6 @@ sites:
   - name: Grafana
     url: https://pik2.penguin-major.ts.net/grafana
 
-  - name: Luong Van Chanh Highschool IT Library
-    url: https://lvc-it-lib.pik2.duckdns.org
-
 commitMessages:
   commitAuthorName: "GitHub automation"
   commitAuthorEmail: "danielphan.2003@gmail.com"
