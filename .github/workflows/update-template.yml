@@ -41,7 +41,7 @@ jobs:
           git-committer-name: ${{ env.GIT_COMMITTER_NAME }}
           git-committer-email: ${{ env.GIT_COMMITTER_EMAIL }}
       - name: Update template
-        uses: danielphan2003/uptime-monitor@master
+        uses: upptime/uptime-monitor@master
         with:
           command: "update-template"
         env:
